@@ -28,27 +28,32 @@ def multiplication_operator(x, y):
 
 def equality_operator(x, y):
   if isinstance(x, float) and isinstance(y, float) or isinstance(x, int) and isinstance(y, int):
-    return x == y
+    return 1 if x == y else 0
   return []
 
 def greater_operator(x, y):
   if isinstance(x, float) and isinstance(y, float) or isinstance(x, int) and isinstance(y, int):
-    return x > y
+    return 1 if x > y else 0
   return []
 
 def lesser_operator(x, y):
   if isinstance(x, float) and isinstance(y, float) or isinstance(x, int) and isinstance(y, int):
-    return x < y
+    return 1 if x < y else 0
   return []
 
 def greater_or_equal_operator(x, y):
   if isinstance(x, float) and isinstance(y, float) or isinstance(x, int) and isinstance(y, int):
-    return x >= y
+    return 1 if x >= y else 0
   return []
 
 def lesser_or_equal_operator(x, y):
   if isinstance(x, float) and isinstance(y, float) or isinstance(x, int) and isinstance(y, int):
-    return x <= y
+    return 1 if x <= y else 0
+  return []
+
+def subtraction_operator(x, y):
+  if isinstance(x, float) and isinstance(y, float) or isinstance(x, int) and isinstance(y, int):
+    return x - y
   return []
 
 def addition_operator(x, y):
@@ -56,10 +61,13 @@ def addition_operator(x, y):
     return x + y
   return []
 
-def subtraction_operator(x, y):
-  if isinstance(x, float) and isinstance(y, float) or isinstance(x, int) and isinstance(y, int):
-    return x - y
-  return []
+def range_procedure(start, stop, step):
+  result = []
+  r = start
+  while r <= stop:
+      result.append(r)
+      r += step
+  return result
 
 def standard_environment():
   environment = {}
@@ -74,33 +82,36 @@ def standard_environment():
     '>=': greater_or_equal_operator,
     '<=': lesser_or_equal_operator,
     '=': equality_operator,
+
     'apply': lambda procedure, arguments: procedure(*arguments),
     'begin': lambda *x: x[-1],
     'car': lambda x: x[0],
     'cdr': lambda x: x[1:], 
     'cons': lambda x, y: [x] + y,
-    'list': lambda *x: list(x), 
+    'list': lambda *x: list(x),
+    'print': lambda x: print(lisply_string(x)),
+    'range': range_procedure,
+
     'list?': lambda x: 1 if isinstance(x, List) else 0, 
     'null?': lambda x: 1 if x == [] else 0,
-    'float?': lambda x: 1 if isinstance(x, float) else 0,
-    'int?': lambda x: 1 if isinstance(x, int) else 0,
+    'real?': lambda x: 1 if isinstance(x, float) else 0,
+    'integral?': lambda x: 1 if isinstance(x, int) else 0,
     'lambda?': lambda x: 1 if callable(x) else 0,
-    'symbol?': lambda x: 1 if isinstance(x, Symbol) else 0,
-    'print': lambda x: print(lisply_string(x))
+    'symbol?': lambda x: 1 if isinstance(x, Symbol) else 0
   })
   return environment
 
 global_environment = standard_environment()
 
 def tokenize(chars: str) -> list:
-  return  chars.replace('(', ' ( ').replace(')', ' ) ').split()
+  return chars.replace('(', ' ( ').replace(')', ' ) ').split()
 
 def parse(program: str) -> Expression:
   return read_from_tokens(tokenize(program))
 
 def read_from_tokens(tokens: list) -> Expression:
   if len(tokens) == 0:
-    raise SyntaxError('Unexpected EOF.')
+    raise SyntaxError('Unexpected end of file.')
   token = tokens.pop(0)
   if token == '(':
     L = []
